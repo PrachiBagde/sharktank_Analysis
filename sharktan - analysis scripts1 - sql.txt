@@ -1,0 +1,110 @@
+use sharktank;
+select * from episodes;
+select * from pitches;
+
+
+-- Show the pitched brands from the clothing industry
+select Brand, Industry 
+from sharktank.pitches
+where Industry = "Clothing"; 
+
+-- Also, show the pitch number for these brands:
+select Pitch_Number, Brand, Industry
+from pitches
+where Industry = "Clothing";
+
+-- Show the pitches that have been successful in attracting investments 
+
+select * from episodes;
+select Pitch_Number,Investment_Amount_In_Lakhs_INR
+from episodes
+where Investment_Amount_In_Lakhs_INR > 0;
+
+
+/* Now, for the successful pitches, also show the brands and the industry information*/
+
+select e.Pitch_Number, e.Investment_Amount_In_Lakhs_INR, p.Brand, p.Industry
+from episodes as e
+inner join pitches as p 
+on e.Pitch_Number = p.Pitch_Number
+where Investment_Amount_In_Lakhs_INR >0;
+
+
+/*How do we know the industries preferred by the sharks?
+In other words, can we extract the number successful pitches in each industry?*/
+
+select p.Industry, count(e.Pitch_Number) as TotalSuccessfulPitches
+from episodes as e 
+inner join pitches as p on e.Pitch_Number = p.Pitch_Number
+where Investment_Amount_In_Lakhs_INR >0
+group by Industry;
+
+-- Let's sort the above data by the total number of investments in descending order
+
+select p.Industry, count(e.Pitch_Number) as TotalSuccessfulPitches 
+from episodes as e 
+inner join pitches as p on e.Pitch_Number = p.Pitch_Number
+where Investment_Amount_In_Lakhs_INR >0
+group by Industry
+order by count(e.Pitch_Number) desc;
+
+-- Just show the top 3 industries that have attracted the investments. 
+
+select p.Industry, count(e.Pitch_Number) as TotalSuccessfulPitches 
+from episodes as e 
+inner join pitches as p on e.Pitch_Number = p.Pitch_Number
+where Investment_Amount_In_Lakhs_INR >0
+group by Industry
+order by count(e.Pitch_Number) desc
+limit 3;
+
+-- Show those industries that have attracted at least 8 investments
+
+select p.Industry, count(e.Pitch_Number) as TotalSuccessfulPitches 
+from episodes as e 
+inner join pitches as p on e.Pitch_Number = p.Pitch_Number
+where Investment_Amount_In_Lakhs_INR > 0
+group by Industry
+having count(e.Pitch_Number) >= 8;
+
+
+/*Let's work on some questions: */
+-- 1. Show the ideas from the Food & Beverages industry.
+
+select Industry, Idea
+from pitches
+where Industry='Food & Beverages';
+
+-- 2. Show the ideas that were able to attract investment amount. Show the idea that got the highest 
+-- investment amount first.
+
+select  p.Idea, p.Industry, e.Investment_Amount_In_Lakhs_INR
+from pitches as p
+inner join episodes as e on p.Pitch_Number = e.Pitch_Number
+where Investment_Amount_In_Lakhs_INR > 0
+order by e.Investment_Amount_In_Lakhs_INR desc;
+
+-- 3. Show the list of top 3 ideas that attracted the highest investment amounts
+
+select  p.Idea, p.Industry, e.Investment_Amount_In_Lakhs_INR
+from pitches as p
+inner join episodes as e on p.Pitch_Number = e.Pitch_Number
+where Investment_Amount_In_Lakhs_INR > 0
+order by e.Investment_Amount_In_Lakhs_INR desc
+limit 3;
+
+-- 4. Show the total number of ideas where Ashneer invested. 
+
+select  count(distinct p.Idea) as TotalnumIdeas , e.Ashneer
+from pitches as p
+join episodes as e on p.Pitch_Number = e.Pitch_Number
+where Investment_Amount_In_Lakhs_INR > 0 and e.Ashneer = 'Y';
+
+-- 5. Show the episodes that had at least 2 investments.
+
+select count(Pitch_Number) as total_investment, Episode_Number
+from episodes
+where Investment_Amount_In_Lakhs_INR > 0 
+group by Episode_Number
+having count(Pitch_Number) >=2;
+
